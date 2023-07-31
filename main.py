@@ -102,7 +102,7 @@ def random_contraction(grafo):
     grafo_copia = grafo.copy()
 
     # Realizar a contração na cópia até restarem apenas 2 vértices
-    while len(grafo_copia) > 2:
+    while len(grafo_copia) > (len(grafo)/2):
         vertice1 = random.choice(list(grafo_copia.nodes()))
         vizinhos_vertice1 = list(grafo_copia[vertice1])
         while len(vizinhos_vertice1) == 0:
