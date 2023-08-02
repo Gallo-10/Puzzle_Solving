@@ -1,6 +1,6 @@
 import itertools
 import networkx as nx
-import random
+from tqdm import tqdm
 
 
 def puzzle_grafo():
@@ -87,32 +87,6 @@ def puzzle_grafo():
     return grafo
 
 
-def contraction(grafo, vertice1, vertice2):
-    # Unir vertice2 em vertice1 (realizar a contração)
-    for vizinho in grafo[vertice2]:
-        if vizinho != vertice1:
-            grafo.add_edge(vertice1, vizinho)
-
-    # Remover vertice2 do grafo
-    grafo.remove_node(vertice2)
-
-
-def random_contraction(grafo):
-    # Fazer uma cópia do grafo para evitar modificar o original
-    grafo_copia = grafo.copy()
-
-    # Realizar a contração na cópia até restarem apenas 2 vértices
-    while len(grafo_copia) > (len(grafo)/2):
-        vertice1 = random.choice(list(grafo_copia.nodes()))
-        vizinhos_vertice1 = list(grafo_copia[vertice1])
-        while len(vizinhos_vertice1) == 0:
-            vertice1 = random.choice(list(grafo_copia.nodes()))
-            vizinhos_vertice1 = list(grafo_copia[vertice1])
-        vertice2 = random.choice(vizinhos_vertice1)
-        contraction(grafo_copia, vertice1, vertice2)
-
-    return grafo_copia
-
 
 def grafo_to_dict(grafo):
     grafo_dict = {}
@@ -156,29 +130,37 @@ def busca_em_extensao(grafo, inicio, objetivo):
                 # Adiciona o pai do vizinho sendo o nó
                 parentes[vizinho] = no
 
+                barra_de_carregamento.update(1)
+
     return False
 
-print("Início do grafo: ")
+def print_puzzle(estado):
+    for i in range(0, 9, 3):
+        print(estado[i:i+3])
+    print()
+
+
+print("Início do grafo! ")
 # Gerar o grafo
 grafo = puzzle_grafo()
-print("Término do grafo: ")
+print("Término do grafo! ")
 
-print("Inicio da contração do grafo: ")
-# Executar a contração
-resultado = random_contraction(grafo)
 
 # Convertendo o grafo para um dicionário de listas
-grafo_dict = grafo_to_dict(resultado)
+grafo_dict = grafo_to_dict(grafo)
 
 # Escolher dois vértices aleatoriamente como origem e objetivo
 origem = (8, 5, 4, 2, 7, 1, 3, 6, 0)
 objetivo = (1,2,3,4,5,6,7,8,0)
 
 # Executar busca em extensão
-print("Início da busca: ",)
+print("Início da busca!")
+barra_de_carregamento = tqdm(total=len(grafo_dict), ncols=80, desc="Buscando", bar_format='{l_bar}{bar}| {n:.0f}/{total_fmt} {postfix}')
+
 if busca_em_extensao(grafo_dict, origem, objetivo) == False:
     print("Caminho não encontrado!")
 else:
     print("Caminho: ", busca_em_extensao(grafo_dict, origem, objetivo))
+    barra_de_carregamento.close()
 #Printa data e hora de término
-print("Término da busca: ", )
+print("Término da busca! ", )
